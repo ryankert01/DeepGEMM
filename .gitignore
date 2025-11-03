@@ -9,3 +9,7 @@ dist
 # Third-party links created by `setup.py develop`
 deep_gemm/include/cute
 deep_gemm/include/cutlass
+
+# Modal cache
+.modal_cache/
+__pycache__/
