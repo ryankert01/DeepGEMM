@@ -23,12 +23,20 @@ Modal is a serverless platform that lets you run code on cloud infrastructure, i
 Run the DeepGEMM benchmark on an H100 GPU:
 
 ```bash
+# Full benchmark suite
 modal run modal_benchmark.py
+
+# Run different benchmark types
+modal run modal_benchmark.py --benchmark-type bf16
+modal run modal_benchmark.py --benchmark-type attention
+
+# Run simple example (single GEMM operation)
+modal run modal_simple_example.py
 ```
 
 This will:
 - Provision an H100 GPU instance
-- Install CUDA Toolkit 12.9
+- Install CUDA Toolkit 12.4
 - Install PyTorch and dependencies
 - Clone and build DeepGEMM
 - Run the FP8 GEMM benchmark
