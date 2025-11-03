@@ -91,11 +91,11 @@ Change the GPU in the `@app.function` decorator:
 
 ```python
 @app.function(
-    gpu=modal.gpu.H100(count=1),  # Single H100
+    gpu="H100",  # Single H100
     # or
-    gpu=modal.gpu.A100(count=1),  # A100 (SM80)
+    gpu="A100",  # A100 (SM80)
     # or
-    gpu=modal.gpu.H100(count=2),  # Multi-GPU
+    gpu="H100:2",  # Multi-GPU (2x H100)
 )
 ```
 
