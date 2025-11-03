@@ -47,6 +47,7 @@ image = (
         "torch>=2.1",
         "numpy",
         "packaging",
+        "wheel",
     )
     # Clone DeepGEMM repository with submodules and build it
     .run_commands(
@@ -58,7 +59,7 @@ image = (
 
 @app.function(
     image=image,
-    gpu=modal.gpu.H100(),  # Request H100 GPU
+    gpu="H100",  # Request H100 GPU
     timeout=3600,  # 1 hour timeout
 )
 def run_deepgemm_benchmark(
