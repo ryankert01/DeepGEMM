@@ -40,9 +40,9 @@ def run_simple_gemm():
     # Create random FP8 matrices
     m, n, k = 8192, 8192, 8192
     
-    # Input matrices (FP8 E4M3)
-    a_fp8 = torch.randn(m, k, dtype=torch.float16, device='cuda').to(torch.float8_e4m3fn)
-    b_fp8 = torch.randn(k, n, dtype=torch.float16, device='cuda').to(torch.float8_e4m3fn)
+    # Input matrices (FP8 E4M3) - create directly as FP8
+    a_fp8 = (torch.randn(m, k, device='cuda') * 0.1).to(torch.float8_e4m3fn)
+    b_fp8 = (torch.randn(k, n, device='cuda') * 0.1).to(torch.float8_e4m3fn)
     
     # Scaling factors (FP32)
     a_sf = torch.ones(m, 1, dtype=torch.float32, device='cuda')

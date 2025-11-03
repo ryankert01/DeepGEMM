@@ -25,6 +25,9 @@ import os
 # Define the Modal app
 app = modal.App("deepgemm-h100-benchmark")
 
+# DeepGEMM installation path on Modal container
+DEEPGEMM_PATH = "/root/DeepGEMM"
+
 # Create a custom image with all required dependencies
 # Using CUDA 12.4 base image which is compatible with DeepGEMM
 image = (
@@ -47,8 +50,8 @@ image = (
     )
     # Clone DeepGEMM repository with submodules and build it
     .run_commands(
-        "cd /root && git clone --recursive https://github.com/deepseek-ai/DeepGEMM.git",
-        "cd /root/DeepGEMM && bash install.sh",
+        f"cd /root && git clone --recursive https://github.com/deepseek-ai/DeepGEMM.git",
+        f"cd {DEEPGEMM_PATH} && bash install.sh",
     )
 )
 
@@ -126,8 +129,8 @@ def run_deepgemm_benchmark(
     
     try:
         result = subprocess.run(
-            ["python", f"/root/DeepGEMM/tests/{test_file}"],
-            cwd="/root/DeepGEMM",
+            ["python", f"{DEEPGEMM_PATH}/tests/{test_file}"],
+            cwd=DEEPGEMM_PATH,
             capture_output=True,
             text=True,
             timeout=1800  # 30 minutes
@@ -145,18 +148,24 @@ def run_deepgemm_benchmark(
             print("=" * 80)
             
             # Parse TFLOPS from output (simple extraction)
+            import re
             tflops_values = []
             for line in result.stdout.split('\n'):
                 if 'TFLOPS' in line:
                     try:
-                        # Extract TFLOPS value
+                        # Extract TFLOPS value using regex
+                        # Look for pattern: number followed by TFLOPS
                         parts = line.split('|')
                         for part in parts:
                             if 'TFLOPS' in part:
-                                tflops = float(part.split()[0])
-                                tflops_values.append(tflops)
-                    except:
-                        pass
+                                # Extract the number before 'TFLOPS'
+                                match = re.search(r'(\d+(?:\.\d+)?)\s*TFLOPS', part)
+                                if match:
+                                    tflops = float(match.group(1))
+                                    tflops_values.append(tflops)
+                    except (ValueError, IndexError, AttributeError) as e:
+                        # Skip lines that don't match expected format
+                        continue
             
             avg_tflops = sum(tflops_values) / len(tflops_values) if tflops_values else 0
             max_tflops = max(tflops_values) if tflops_values else 0

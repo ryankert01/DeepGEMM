@@ -29,8 +29,8 @@ done
 
 echo ""
 echo "✓ Validating Python syntax..."
-python -m py_compile modal_benchmark.py
-python -m py_compile modal_simple_example.py
+python3 -m py_compile modal_benchmark.py
+python3 -m py_compile modal_simple_example.py
 echo "  ✓ modal_benchmark.py syntax OK"
 echo "  ✓ modal_simple_example.py syntax OK"
 
