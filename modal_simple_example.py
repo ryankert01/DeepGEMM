@@ -20,7 +20,7 @@ image = (
         "CUDA_HOME": "/usr/local/cuda",
         "PATH": "/usr/local/cuda/bin:$PATH",
     })
-    .pip_install("torch>=2.1", "numpy", "packaging")
+    .pip_install("torch>=2.1", "numpy", "packaging", "wheel")
     .run_commands(
         "cd /root && git clone --recursive https://github.com/deepseek-ai/DeepGEMM.git",
         "cd /root/DeepGEMM && bash install.sh",
@@ -28,7 +28,7 @@ image = (
 )
 
 
-@app.function(image=image, gpu=modal.gpu.H100())
+@app.function(image=image, gpu="H100")
 def run_simple_gemm():
     """Run a simple FP8 GEMM operation"""
     import torch
