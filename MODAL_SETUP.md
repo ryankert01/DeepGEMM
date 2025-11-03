@@ -125,7 +125,7 @@ Add DeepGEMM environment variables:
 
 ### CUDA Version Mismatch
 
-If you see CUDA version errors, ensure the image uses CUDA 12.9+ as recommended in DeepGEMM's README.
+If you see CUDA version errors, the Modal script uses CUDA 12.4 base image, which is compatible with DeepGEMM (requires CUDA 12.3+). DeepGEMM recommends CUDA 12.9+ for best performance, but 12.4 provides good compatibility.
 
 ### Build Failures
 
@@ -144,7 +144,7 @@ If `torch.cuda.is_available()` returns False:
 ### Performance Lower Than Expected
 
 - Verify you're using an H100 (SM90) GPU
-- Check that CUDA 12.9 is installed
+- The script uses CUDA 12.4; upgrading to 12.9+ may improve performance
 - Ensure no CPU throttling or resource contention
 - Review DeepGEMM environment variables
 
