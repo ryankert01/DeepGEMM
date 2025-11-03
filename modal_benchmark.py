@@ -131,7 +131,7 @@ def run_deepgemm_benchmark(
     try:
         result = subprocess.run(
             ["python", f"{DEEPGEMM_PATH}/tests/{test_file}"],
-            cwd=DEEPGEMM_PATH,
+            cwd="/root",  # Run from /root instead of source directory to avoid import conflicts
             capture_output=True,
             text=True,
             timeout=1800  # 30 minutes
