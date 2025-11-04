@@ -23,7 +23,7 @@ image = (
     .pip_install("torch>=2.1", "numpy", "packaging", "wheel")
     .run_commands(
         "cd /root && git clone --recursive https://github.com/deepseek-ai/DeepGEMM.git",
-        "cd /root/DeepGEMM && bash install.sh",
+        "cd /root/DeepGEMM && pip install -e . --no-build-isolation",
     )
 )
 
