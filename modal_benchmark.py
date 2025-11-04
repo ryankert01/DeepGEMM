@@ -52,7 +52,8 @@ image = (
     # Clone DeepGEMM repository with submodules and build it
     .run_commands(
         f"cd /root && git clone --recursive https://github.com/deepseek-ai/DeepGEMM.git",
-        f"cd {DEEPGEMM_PATH} && bash install.sh",
+        f"cd {DEEPGEMM_PATH} && bash install.sh && echo 'Installation completed successfully' || (echo 'ERROR: Installation failed' && exit 1)",
+        f"python -c 'import deep_gemm; print(f\"deep_gemm installed: {{deep_gemm.__version__}}\")' || (echo 'ERROR: Cannot import deep_gemm after installation' && exit 1)",
     )
 )
 
@@ -127,6 +128,31 @@ def run_deepgemm_benchmark(
     print(f"Running {benchmark_type.upper()} benchmark: {test_file}")
     print(f"Parameters: warmups={num_warmups}, tests={num_tests}")
     print("-" * 80)
+    
+    # Verify deep_gemm installation before running tests
+    print("\nVerifying deep_gemm installation...")
+    try:
+        import deep_gemm
+        import deep_gemm_cpp
+        print(f"✓ deep_gemm imported successfully")
+        print(f"  deep_gemm location: {deep_gemm.__file__}")
+        print(f"  deep_gemm_cpp location: {deep_gemm_cpp.__file__}")
+        print(f"  deep_gemm version: {deep_gemm.__version__}")
+    except ImportError as e:
+        print(f"✗ Failed to import deep_gemm: {e}")
+        print("\nAttempting to diagnose the issue...")
+        import subprocess
+        result = subprocess.run(["pip", "show", "deep_gemm"], capture_output=True, text=True)
+        print("pip show deep_gemm:")
+        print(result.stdout)
+        if result.stderr:
+            print("stderr:", result.stderr)
+        return {
+            "status": "error",
+            "error": f"deep_gemm import failed: {e}",
+            "pip_info": result.stdout
+        }
+    print()
     
     try:
         # Set PYTHONPATH to include tests directory for local imports like generators.py
