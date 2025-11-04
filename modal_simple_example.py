@@ -15,7 +15,7 @@ image = (
         "nvidia/cuda:12.4.0-devel-ubuntu22.04",
         add_python="3.11"
     )
-    .apt_install("git", "build-essential")  # build-essential includes g++, gcc, make
+    .apt_install("git", "build-essential", "clang")  # build-essential + clang for C++ compilation
     .env({
         "CUDA_HOME": "/usr/local/cuda",
         "PATH": "/usr/local/cuda/bin:$PATH",
