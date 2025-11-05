@@ -89,17 +89,13 @@ DeepGEMM can be run on Modal.com's cloud infrastructure with H100 GPUs:
 
 ```bash
 # Install Modal
-pip install -r modal_requirements.txt
+pip install modal>=0.57.0
 
 # Authenticate with Modal
 modal setup
 
 # Run benchmark on H100 GPU
 modal run modal_benchmark.py
-
-# Run different benchmarks
-modal run modal_benchmark.py --benchmark-type bf16
-modal run modal_benchmark.py --benchmark-type attention
 ```
 
 See [MODAL_SETUP.md](MODAL_SETUP.md) for detailed documentation.

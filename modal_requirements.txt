@@ -1,3 +1,0 @@
-# Requirements for running DeepGEMM on Modal.com
-# modal 0.57.0+ required for H100 GPU support and latest API features
-modal>=0.57.0
