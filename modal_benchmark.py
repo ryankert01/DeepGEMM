@@ -35,7 +35,7 @@ image = (
         "nvidia/cuda:12.4.0-devel-ubuntu22.04",
         add_python="3.11"
     )
-    .apt_install("git")
+    .apt_install("git", "build-essential", "clang")  # build-essential + clang for C++ compilation
     # Set CUDA environment variables
     .env({
         "CUDA_HOME": "/usr/local/cuda",
@@ -47,18 +47,19 @@ image = (
         "torch>=2.1",
         "numpy",
         "packaging",
+        "wheel",
     )
     # Clone DeepGEMM repository with submodules and build it
     .run_commands(
         f"cd /root && git clone --recursive https://github.com/deepseek-ai/DeepGEMM.git",
-        f"cd {DEEPGEMM_PATH} && bash install.sh",
+        f"cd {DEEPGEMM_PATH} && cat develop.sh && ./develop.sh && pip install -e . --no-build-isolation && echo 'Installation completed successfully' || (echo 'ERROR: Installation failed' && exit 1)",
     )
 )
 
 
 @app.function(
     image=image,
-    gpu=modal.gpu.H100(),  # Request H100 GPU
+    gpu="H100",  # Request H100 GPU
     timeout=3600,  # 1 hour timeout
 )
 def run_deepgemm_benchmark(
@@ -127,10 +128,40 @@ def run_deepgemm_benchmark(
     print(f"Parameters: warmups={num_warmups}, tests={num_tests}")
     print("-" * 80)
     
+    # Verify deep_gemm installation before running tests
+    print("\nVerifying deep_gemm installation...")
     try:
+        import deep_gemm
+        import deep_gemm_cpp
+        print(f"✓ deep_gemm imported successfully")
+        print(f"  deep_gemm location: {deep_gemm.__file__}")
+        print(f"  deep_gemm_cpp location: {deep_gemm_cpp.__file__}")
+        print(f"  deep_gemm version: {deep_gemm.__version__}")
+    except ImportError as e:
+        print(f"✗ Failed to import deep_gemm: {e}")
+        print("\nAttempting to diagnose the issue...")
+        import subprocess
+        result = subprocess.run(["pip", "show", "deep_gemm"], capture_output=True, text=True)
+        print("pip show deep_gemm:")
+        print(result.stdout)
+        if result.stderr:
+            print("stderr:", result.stderr)
+        return {
+            "status": "error",
+            "error": f"deep_gemm import failed: {e}",
+            "pip_info": result.stdout
+        }
+    print()
+    
+    try:
+        # Set PYTHONPATH to include tests directory for local imports like generators.py
+        env = os.environ.copy()
+        env['PYTHONPATH'] = f"{DEEPGEMM_PATH}/tests"
+        
         result = subprocess.run(
             ["python", f"{DEEPGEMM_PATH}/tests/{test_file}"],
-            cwd=DEEPGEMM_PATH,
+            cwd="/root",  # Run from /root instead of source directory to avoid import conflicts
+            env=env,
             capture_output=True,
             text=True,
             timeout=1800  # 30 minutes
