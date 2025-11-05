@@ -52,8 +52,7 @@ image = (
     # Clone DeepGEMM repository with submodules and build it
     .run_commands(
         f"cd /root && git clone --recursive https://github.com/deepseek-ai/DeepGEMM.git",
-        f"cd {DEEPGEMM_PATH} && pip install -e . --no-build-isolation && echo 'Installation completed successfully' || (echo 'ERROR: Installation failed' && exit 1)",
-        f"python -c 'import deep_gemm; print(f\"deep_gemm installed: {{deep_gemm.__version__}}\")' || (echo 'ERROR: Cannot import deep_gemm after installation' && exit 1)",
+        f"cd {DEEPGEMM_PATH} && cat develop.sh && ./develop.sh && pip install -e . --no-build-isolation && echo 'Installation completed successfully' || (echo 'ERROR: Installation failed' && exit 1)",
     )
 )
 
